@@ -1,6 +1,31 @@
 import math
 
 def countTriplets(arr, r):
+    num_triplets = 0
+    right_dict = {}
+    left_dict = {}
+    for ind, num in enumerate(arr):
+        if num in right_dict.keys():
+            right_dict[num] += 1
+        else:
+            right_dict[num] = 1
+
+    if r == 1:
+        for num in right_dict.keys():
+            num_triplets += math.comb(right_dict[num], 3)
+    else:
+        for ind,num in enumerate(arr):
+            if num % r == 0:
+                if num//r in left_dict.keys() and num*r in right_dict.keys():
+                    num_triplets += left_dict[num//r]*right_dict[num*r]
+            right_dict[num] -= 1
+            if num in left_dict.keys():
+                left_dict[num] += 1
+            else:
+                left_dict[num] = 1
+    return num_triplets
+
+def countTriplets_0(arr, r):
     num_dict = {}
     for ind, num in enumerate(arr):
         if num in num_dict.keys():
@@ -32,10 +57,14 @@ def countTriplets(arr, r):
                     elif t_2 < t_1:
                         t_2_pointer += 1
                     else:
-                        for i in t_1_list[t_1_pointer:]:
-                            for j in t_2_list[t_2_pointer:]:
-                                if j > i:
-                                    num_triplets += 1
+                        i = t_1_pointer
+                        j = t_2_pointer
+                        while i < len(t_1_list) and j < len(t_2_list):
+                            if t_1_list[i] > t_2_list[j]:
+                                j += 1
+                            else:
+                                num_triplets += len(t_2_list) - j
+                                i += 1
                         t_0_pointer += 1
     return num_triplets
 
@@ -58,6 +87,11 @@ def test_3():
     arr = [1, 1000, 1000, 100, 100, 10, 100, 1000, 100, 1000, 10000, 100]
     r = 10
     assert countTriplets(arr, r) == 13
+
+def test_3():
+    arr = [1]*100
+    r = 1
+    assert countTriplets(arr, r) == 161700
 
 if __name__ == '__main__':
     test_3()
